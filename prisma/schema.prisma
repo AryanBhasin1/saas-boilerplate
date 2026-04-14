@@ -1,0 +1,99 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model Org {
+  id               String    @id @default(cuid())
+  clerkOrgId       String    @unique
+  name             String
+  stripeCustomerId String?   @unique
+  stripePriceId    String?
+  plan             Plan      @default(FREE)
+  tokensUsed       Int       @default(0)
+  tokensLimit      Int       @default(50000)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  documents  Document[]
+  messages   Message[]
+  usageLogs  UsageLog[]
+
+  @@index([clerkOrgId])
+}
+
+model Document {
+  id        String      @id @default(cuid())
+  orgId     String
+  name      String
+  size      Int
+  status    EmbedStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+
+  org    Org             @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  chunks DocumentChunk[]
+
+  @@index([orgId])
+}
+
+model DocumentChunk {
+  id         String                      @id @default(cuid())
+  orgId      String
+  documentId String
+  content    String
+  embedding  Unsupported("vector(384)")?
+  chunkIndex Int
+  createdAt  DateTime                    @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([documentId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  orgId     String
+  userId    String
+  role      String
+  content   String
+  tokens    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  org Org @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, userId])
+}
+
+model UsageLog {
+  id        String   @id @default(cuid())
+  orgId     String
+  tokens    Int
+  model     String
+  createdAt DateTime @default(now())
+
+  org Org @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+  @@index([orgId, createdAt])
+}
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum EmbedStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+}

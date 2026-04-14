@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env.*.local
+dist/
+build/
+prisma/*.db
+.DS_Store
+*.pem
+npm-debug.log*
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+/tmp/xenova-cache
