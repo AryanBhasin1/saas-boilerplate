@@ -1,11 +1,15 @@
 import Stripe from 'stripe'
 import { db } from './db'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia',
-})
+function getStripe() {
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY is not set')
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-02-24.acacia',
+  })
+}
 
 export async function getOrCreateStripeCustomer(orgId: string, email?: string) {
+  const stripe = getStripe()
   const org = await db.org.findUnique({ where: { id: orgId } })
   if (!org) throw new Error('Org not found')
   if (org.stripeCustomerId) {
@@ -19,6 +23,7 @@ export async function getOrCreateStripeCustomer(orgId: string, email?: string) {
 }
 
 export async function createCheckoutSession(orgId: string, priceId: string, userEmail?: string) {
+  const stripe = getStripe()
   const customer = await getOrCreateStripeCustomer(orgId, userEmail)
   return stripe.checkout.sessions.create({
     customer: customer.id,
@@ -32,6 +37,7 @@ export async function createCheckoutSession(orgId: string, priceId: string, user
 }
 
 export async function createPortalSession(orgId: string) {
+  const stripe = getStripe()
   const org = await db.org.findUnique({ where: { id: orgId } })
   if (!org?.stripeCustomerId) throw new Error('No Stripe customer found')
   return stripe.billingPortal.sessions.create({
