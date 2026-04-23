@@ -6,7 +6,7 @@ export function Toaster() {
   const { toasts } = useToast()
   return (
     <ToastProvider>
-      {toasts.map(({ id, title, description, action, ...props }) => (
+      {toasts.map(({ id, title, description, ...props }) => (
         <Toast key={id} {...props}>
           <div style={{ flex: 1 }}>
             {title && <ToastTitle>{title}</ToastTitle>}
