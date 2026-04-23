@@ -30,7 +30,7 @@
     "groq-sdk": "^0.7.0",
     "ioredis": "^5.4.1",
     "lucide-react": "^0.469.0",
-    "next": "15.2.3",
+    "next": "15.2.8",
     "pdf-parse": "^1.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
