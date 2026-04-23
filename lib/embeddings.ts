@@ -1,8 +1,7 @@
-import type { Pipeline } from '@xenova/transformers'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let pipeline: any = null
 
-let pipeline: Pipeline | null = null
-
-async function getEmbeddingPipeline(): Promise<Pipeline> {
+async function getEmbeddingPipeline() {
   if (pipeline) return pipeline
   const { pipeline: createPipeline, env } = await import('@xenova/transformers')
   env.cacheDir = '/tmp/xenova-cache'
