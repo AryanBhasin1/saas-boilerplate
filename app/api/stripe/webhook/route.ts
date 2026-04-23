@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { stripe, planFromPriceId } from '@/lib/stripe'
+import { planFromPriceId } from '@/lib/stripe'
 import { db } from '@/lib/db'
 import Stripe from 'stripe'
 
 export const runtime = 'nodejs'
 
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2025-02-24.acacia',
+  })
+}
+
 export async function POST(req: NextRequest) {
+  const stripe = getStripe()
   const body = await req.text()
   const sig = req.headers.get('stripe-signature')!
   let event: Stripe.Event
