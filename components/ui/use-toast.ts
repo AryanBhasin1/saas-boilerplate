@@ -1,11 +1,13 @@
 'use client'
 import { useState, useCallback } from 'react'
+import type React from 'react'
 import type { ToastProps } from './toast'
 
 interface ToastItem extends ToastProps {
   id: string
   title?: string
   description?: string
+  action?: React.ReactNode
 }
 
 let count = 0
