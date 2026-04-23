@@ -5,11 +5,13 @@ import { DocumentManager } from '@/components/document-manager'
 export default async function DocumentsPage() {
   const { org } = await getOrgContext()
 
-  const documents = await db.document.findMany({
+  const raw = await db.document.findMany({
     where: { orgId: org.id },
     orderBy: { createdAt: 'desc' },
     include: { _count: { select: { chunks: true } } },
   })
+
+  const documents = raw.map(d => ({ ...d, createdAt: d.createdAt.toISOString() }))
 
   return (
     <div style={{ padding: '40px', fontFamily: 'var(--font-body)' }}>
